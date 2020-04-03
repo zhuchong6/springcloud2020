@@ -1,0 +1,48 @@
+server:
+  port: 9527
+
+spring:
+  application:
+    name: cloud-gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true #开启从注册中心动态创建路由的功能，利用微服务名进行路由
+      routes:
+        #payment_routh 路由id，没有固定规则但要求唯一，建议配合服务名
+        - id: payment8002_routh
+
+          #uri: http://localhost:8002 #匹配后提供服务的路由地址
+          uri: lb://CLOUD-PROVIDER-SERVICE  #利用服务名进行路由
+          predicates:
+            #断言，路径相匹配的进行路由转发
+            - Path=/payment/get/**
+
+        - id: payment8002_routh2
+          #uri: http://localhost:8002
+          uri: lb://CLOUD-PROVIDER-SERVICE  #利用服务名进行路由
+          predicates:
+            - Path=/payment/lb/**
+            - After=2020-04-04T03:44:26.086+08:00[Asia/Shanghai]
+            #- Before=2017-01-20T17:42:47.789-07:00[America/Denver]
+            #- Between=2017-01-20T17:42:47.789-07:00[America/Denver], 2017-01-21T17:42:47.789-07:00[America/Denver]
+            #- Cookie=username, zhu #要求带有cookie 并且键值对为key-username value-zhu
+            #- Header=X-Request-Id, \d+ #请求头要求有X-Request-Id 并且属性值为整数的正则表达式
+
+eureka:
+  client:
+    #表示将自己注册进入eureka-server默认为true
+    register-with-eureka: true
+    #是否从eureka-server抓取已有注册信息，单节点无所谓，集群必须设置为true才能配合ribbon使用负载均衡
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:7001/eureka
+
+  instance:
+      instance-id: gateway9527 #服务名称
+      prefer-ip-address: true #显示ip
+      #eureka客户端向服务端发送心跳检测时间间隔，默认30s
+      lease-renewal-interval-in-seconds: 1
+      #eureka服务端收到最后一次心跳检测后等待时间上限，默认90s，超时就会删除服务
+      lease-expiration-duration-in-seconds: 2
