@@ -7,10 +7,16 @@ spring:
     config:
       server:
         git:
-          uri: git@github.com:zhuchong6/spring-config.git #github上仓库的名字
+          uri: https://github.com/zhuchong6/spring-config.git #github上仓库的名字
           search-paths:
             - spring-config  #搜索目录
       label: master #读取分支
+  #rabbitMQ相关配置,只需要刷新配置中心，其他节点就能获取更新的配置
+  rabbitmq:
+    host: localhost
+    port: 5673
+    username: guest
+    password: guest
 
 eureka:
   client:
@@ -27,3 +33,15 @@ eureka:
     lease-renewal-interval-in-seconds: 1
     #eureka服务端收到最后一次心跳检测后等待时间上限，默认90s，超时就会删除服务
     lease-expiration-duration-in-seconds: 2
+
+
+
+#rabbitMQ相关配置，暴露bus刷新配置的端点
+management:
+  endpoint:
+  endpoints:
+    web:
+      exposure:
+        include: 'bus-refresh'
+#全局刷新命令   curl -X POST "http://localhost:3344/actuator/bus-refresh"
+#刷新指定机器命令   curl -X POST "http://localhost:3344/actuator/bus-refresh/config-client:3355"

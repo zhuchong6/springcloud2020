@@ -1,0 +1,39 @@
+server:
+  port: 3355
+spring:
+  application:
+    name: config-client
+  cloud:
+    config: #配置
+      label: master #分支名称
+      name: config #配置文件名字
+      profile: dev #读取后缀文件 综上，读取配置中心的文件：master分支上的config-dev.yml文件
+      uri: http://localhost:3344 #配置中心地址
+  #rabbitMQ相关配置
+  rabbitmq:
+    host: localhost
+    port: 5673
+    username: guest
+    password: guest
+eureka:
+  client:
+    #表示将自己注册进入eureka-server默认为true
+    register-with-eureka: true
+    #是否从eureka-server抓取已有注册信息，单节点无所谓，集群必须设置为true才能配合ribbon使用负载均衡
+    fetch-registry: true
+    service-url:
+      defaultZone: http://eureka7001.com:7001/eureka/,http://eureka7002.com:7002/eureka/,http://eureka7003.com:7003/eureka/
+  instance:
+    instance-id: config-client3355 #服务名称
+    prefer-ip-address: true #显示ip
+    #eureka客户端向服务端发送心跳检测时间间隔，默认30s
+    lease-renewal-interval-in-seconds: 1
+    #eureka服务端收到最后一次心跳检测后等待时间上限，默认90s，超时就会删除服务
+    lease-expiration-duration-in-seconds: 2
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+#暴露端口，刷新配置，必须要执行post请求才能实现刷新 curl -X POST "http://localhost:3355/actuator/refresh"
+
